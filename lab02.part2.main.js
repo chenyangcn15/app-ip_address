@@ -6,17 +6,18 @@
 */
 const IPCIDR = require('ip-cidr');
 
-/**
+ /**
  * Calculate and return the first host IP address from a CIDR subnet.
  * @param {string} cidrStr - The IPv4 subnet expressed
  *                 in CIDR format.
  * @param {callback} callback - A callback function.
- * @return {object} IpAddresses - A result with two propertiess: ipv4 and ipv6
+ * @return {object} {ipv4: firstIpAddress, ipv6: IPv6Address} - A result with two propertiess: ipv4 and ipv6
  */
 function getFirstIpAddress(cidrStr, callback) {
 
   // Initialize return arguments for callback
   let FirstIpAddress = null;
+  let IPv6Address = null;
   let callbackError = null;
 
   // Instantiate an object from the imported class and assign the instance to variable cidr.
@@ -38,16 +39,13 @@ function getFirstIpAddress(cidrStr, callback) {
     // If the passed CIDR is valid, call the object's toArray() method.
     // Notice the destructering assignment syntax to get the value of the first array's element.
     [FirstIpAddress] = cidr.toArray(options);
-    var ipAddresses = {
-        ipv4:FirstIpAddress,
-        ipv6:getIpv4MappedIpv6Address(FirstIpAddress)
-    }
+    IPv6Address = getIpv4MappedIpv6Address(FirstIpAddress);
   }
   // Call the passed callback function.
   // Node.js convention is to pass error data as the first argument to a callback.
   // The IAP convention is to pass returned data as the first argument and error
   // data as the second argument to the callback function.
-  return callback(ipAddresses, callbackError);
+  return callback({ipv4: FirstIpAddress, ipv6: IPv6Address}, callbackError);
 }
 
 /**
